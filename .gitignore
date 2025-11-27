@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.parcel-cache/
+*.zip
+.env
+.env.local
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/settings.json
+*.log
+npm-debug.log*

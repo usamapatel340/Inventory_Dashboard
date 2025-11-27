@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inventory Dashboard - Demo</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css"
+    />
+    <style>
+      body {
+        padding: 16px;
+      }
+      .low {
+        background: #fff4f4;
+        border-left: 4px solid #ff6b6b;
+      }
+      .ok {
+        background: #f4fff7;
+        border-left: 4px solid #2ecc71;
+      }
+      .card {
+        padding: 12px;
+        margin-bottom: 8px;
+      }
+      .history {
+        font-size: 0.9em;
+        color: #333;
+      }
+      .small {
+        font-size: 0.85em;
+      }
+      .sidebar {
+        max-width: 320px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Inventory Dashboard - Frontend Demo</h1>
+      <p class="small">
+        Local demo: no AWS required yet. This app simulates the UI and SNS alert
+        flow.
+      </p>
+    </header>
+
+    <div id="root"></div>
+    <script type="module" src="./src/index.js"></script>
+  </body>
+</html>

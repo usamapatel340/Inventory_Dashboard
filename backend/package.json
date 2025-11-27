@@ -1,0 +1,20 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lambda-handler-v3.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.940.0",
+    "@aws-sdk/client-lambda": "^3.940.0",
+    "@aws-sdk/client-sns": "^3.940.0",
+    "@aws-sdk/lib-dynamodb": "^3.940.0",
+    "express": "^5.1.0"
+  }
+}

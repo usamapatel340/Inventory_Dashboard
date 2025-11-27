@@ -1,0 +1,8 @@
+{
+  "httpMethod": "PATCH",
+  "path": "/products/piwi0aeg/quantity",
+  "body": "{\"delta\":1}",
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}
