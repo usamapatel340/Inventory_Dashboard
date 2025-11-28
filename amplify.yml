@@ -1,10 +1,4 @@
 version: 1
-backend:
-  phases:
-    build:
-      commands:
-        - "# Backend deployment skipped - using manual deployment"
-        - "echo 'Backend resources deployed separately'"
 frontend:
   phases:
     build:
