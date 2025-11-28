@@ -1,19 +1,18 @@
 version: 1
-frontend:
+backend:
   phases:
-    install:
-      commands:
-        - echo "Installing frontend dependencies..."
-        - cd frontend
-        - npm ci
     build:
       commands:
-        - echo "Building frontend with Parcel..."
-        - npm run build
+        - "# Execute Amplify CLI with the helper script"
+        - "amplifyPush --simple"
+frontend:
+  phases:
+    build:
+      commands:
+        - "cd frontend && npm ci && npm run build"
   artifacts:
-    baseDirectory: dist
+    baseDirectory: frontend/dist
     files:
       - "**/*"
   cache:
-    paths:
-      - "node_modules/**/*"
+    paths: []
