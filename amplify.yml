@@ -3,8 +3,8 @@ backend:
   phases:
     build:
       commands:
-        - "# Execute Amplify CLI with the helper script"
-        - "amplifyPush --simple"
+        - "# Backend deployment skipped - using manual deployment"
+        - "echo 'Backend resources deployed separately'"
 frontend:
   phases:
     build:
