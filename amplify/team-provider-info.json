@@ -1,15 +1,15 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-projectinvent-dev-e0c3b-authRole",
-      "UnauthRoleArn": "arn:aws:iam::873828695513:role/amplify-projectinvent-dev-e0c3b-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::873828695513:role/amplify-projectinvent-dev-e0c3b-authRole",
+      "AuthRoleName": "amplify-projectinvent-dev-6d495-authRole",
+      "UnauthRoleArn": "arn:aws:iam::873828695513:role/amplify-projectinvent-dev-6d495-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::873828695513:role/amplify-projectinvent-dev-6d495-authRole",
       "Region": "ap-south-1",
-      "DeploymentBucketName": "amplify-projectinvent-dev-e0c3b-deployment",
-      "UnauthRoleName": "amplify-projectinvent-dev-e0c3b-unauthRole",
-      "StackName": "amplify-projectinvent-dev-e0c3b",
-      "StackId": "arn:aws:cloudformation:ap-south-1:873828695513:stack/amplify-projectinvent-dev-e0c3b/cd3ecd70-cc15-11f0-8aa5-021ce5cbead3",
-      "AmplifyAppId": "d3eawldbyewaly"
+      "DeploymentBucketName": "amplify-projectinvent-dev-6d495-deployment",
+      "UnauthRoleName": "amplify-projectinvent-dev-6d495-unauthRole",
+      "StackName": "amplify-projectinvent-dev-6d495",
+      "StackId": "arn:aws:cloudformation:ap-south-1:873828695513:stack/amplify-projectinvent-dev-6d495/d5ebbc80-cc33-11f0-9bf1-06f897c436fd",
+      "AmplifyAppId": "d1dx8zc89k2j1r"
     }
   }
 }
