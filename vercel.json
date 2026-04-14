@@ -8,11 +8,5 @@
     }
   },
   "buildCommand": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
-  "outputDirectory": "frontend/dist",
-  "redirects": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/handler.:ext?"
-    }
-  ]
+  "outputDirectory": "frontend/dist"
 }
