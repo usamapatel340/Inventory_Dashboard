@@ -1,30 +1,13 @@
-import { Auth } from "aws-amplify";
 import awsConfig from "./awsConfig";
 
 // API Service for backend calls
 const API_BASE_URL = awsConfig.lambdaEndpoint;
 
-// Helper to get auth token
-async function getAuthToken() {
-  try {
-    const session = await Auth.currentSession();
-    return session.getIdToken().getJwtToken();
-  } catch (err) {
-    console.error("Error getting auth token:", err);
-    return null;
-  }
-}
-
 // Helper for API calls
 async function apiCall(endpoint, method = "GET", body = null) {
-  const token = await getAuthToken();
   const headers = {
     "Content-Type": "application/json",
   };
-
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
 
   const options = {
     method,
@@ -44,7 +27,7 @@ async function apiCall(endpoint, method = "GET", body = null) {
       const errorText = await response.text();
       console.error(
         `API Error: ${response.status} ${response.statusText}`,
-        errorText
+        errorText,
       );
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
@@ -54,7 +37,7 @@ async function apiCall(endpoint, method = "GET", body = null) {
       "API Success - Data type:",
       typeof data,
       "Is null?",
-      data === null
+      data === null,
     );
     return { success: true, data };
   } catch (err) {
@@ -153,7 +136,7 @@ export const localStorageAPI = {
       } catch (e) {}
     }
     data.products = data.products.map((p) =>
-      p.product_id === id ? { ...p, ...product } : p
+      p.product_id === id ? { ...p, ...product } : p,
     );
     localStorage.setItem("pi_inventory_v1", JSON.stringify(data));
     return { success: true, data: product };
