@@ -1,0 +1,19 @@
+{
+  "name": "inventory-dashboard",
+  "version": "1.0.0",
+  "functions": {
+    "api/**": {
+      "memory": 512,
+      "maxDuration": 30
+    }
+  },
+  "buildCommand": "npm install --prefix backend && npm install --prefix frontend",
+  "outputDirectory": "frontend/dist",
+  "env": ["FIREBASE_CONFIG", "ALERT_EMAIL", "ALERT_EMAIL_PASSWORD"],
+  "redirects": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/handler.:ext?"
+    }
+  ]
+}
