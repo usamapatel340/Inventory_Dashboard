@@ -470,4 +470,5 @@ Private project for inventory management system.
 **Version:** 1.0.0-beta  
 **Status:** Frontend complete, Backend in progress
 #   I n v e n t o r y _ D a s h b o a r d  
+ #   I n v e n t o r y   D a s h b o a r d   -   F i r e s t o r e   +   V e r c e l  
  
