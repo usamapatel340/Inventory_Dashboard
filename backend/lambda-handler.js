@@ -79,17 +79,37 @@ async function getProduct(productId) {
 // Create product
 async function createProduct(body) {
     try {
+        console.log("📝 Creating product with body:", body);
+
+        if (!body || typeof body !== 'object') {
+            console.error("❌ Body is not a valid object:", typeof body, body);
+            return response(400, { error: "Body must be a valid JSON object" });
+        }
+
+        if (!body.name || !body.sku) {
+            console.error("❌ Missing required fields:", { name: body.name, sku: body.sku });
+            return response(400, { error: "Missing required fields: name, sku" });
+        }
+
         const product = {
             ...body,
-            history: [],
+            history: body.history || [],
             createdAt: admin.firestore.Timestamp.now(),
             updatedAt: admin.firestore.Timestamp.now(),
         };
+
+        console.log("📦 Product object to save:", JSON.stringify(product));
+
         const docRef = await db.collection(COLLECTION_NAME).add(product);
         console.log(`✅ Created product: ${docRef.id}`);
-        return response(201, { product_id: docRef.id, ...product });
+
+        const result = { product_id: docRef.id, ...product };
+        console.log("✅ Returning:", result);
+
+        return response(201, result);
     } catch (error) {
-        console.error("❌ Error creating product:", error);
+        console.error("❌ Error creating product:", error.message);
+        console.error("Stack:", error.stack);
         return response(500, { error: "Failed to create product", details: error.message });
     }
 }
@@ -274,38 +294,43 @@ async function sendAlertById(productId) {
 async function handler(event, context) {
     try {
         // Extract HTTP method and path
-        const method = event.httpMethod || event.requestContext?.http?.method;
+        const method = event.httpMethod || event.requestContext ? .http ? .method;
         const path = event.path || event.rawPath || "";
-        
+
+        console.log("📨 HANDLER CALLED:", { method, path });
+
         // Parse body
         let body = {};
         if (event.body) {
             try {
+                console.log("📄 Raw body type:", typeof event.body, "First 100 chars:", String(event.body).substring(0, 100));
                 body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+                console.log("✅ Body parsed:", body);
             } catch (e) {
                 console.error("⚠️ Failed to parse body:", e.message);
+                console.error("Body was:", event.body);
             }
         }
 
-        console.log(`📝 ${method} ${path}`);
+        console.log(`📝 ${method} ${path}`, "Body keys:", Object.keys(body));
 
         // Route requests
-        
+
         // GET /products or /products/search
         if (method === "GET" && path === "/products") {
             return await getProducts();
         }
-        
+
         if (method === "GET" && path === "/products/low-stock") {
             return await getLowStock();
         }
-        
+
         if (method === "GET" && path.includes("/products/search")) {
             const url = new URL(`http://localhost${path}${event.queryStringParameters ? "?" + new URLSearchParams(event.queryStringParameters).toString() : ""}`);
             const query = url.searchParams.get("q") || "";
             return await searchProducts(query);
         }
-        
+
         if (method === "GET" && /^\/products\/[^/]+$/.test(path)) {
             const productId = path.split("/")[2];
             return await getProduct(productId);
