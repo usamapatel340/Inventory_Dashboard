@@ -1,45 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { hybridAPI } from "./api";
 
-const storageKey = "pi_inventory_v1";
-
-function loadData() {
-    const raw = localStorage.getItem(storageKey);
-    if (!raw) return null;
-    try {
-        return JSON.parse(raw);
-    } catch (e) {
-        return null;
-    }
-}
-
-function saveData(data) {
-    localStorage.setItem(storageKey, JSON.stringify(data));
-}
-
-function mockSendAlert(product, method = "sms") {
-    console.log(
-        "[MOCK] Sending",
-        method,
-        "for",
-        product.name,
-        "qty=",
-        product.qty
-    );
-    return Promise.resolve({ success: true });
-}
-
 function Header({ counts }) {
     return ( <
         div >
         <
         div style = {
-            {
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-            }
-        } >
+            { display: "flex", justifyContent: "space-between", alignItems: "center" } } >
         <
         div >
         <
@@ -147,8 +114,7 @@ function ProductCard({ p, onAdjust, onEdit, onAlert, onShowHistory }) {
 
         function submit(e) {
             e.preventDefault();
-            const newId =
-                product ? .product_id || "p" + Math.random().toString(36).slice(2, 9);
+            const newId = product ? .product_id || "p" + Math.random().toString(36).slice(2, 9);
             const obj = {
                 ...product,
                 product_id: newId,
@@ -309,16 +275,14 @@ function ProductCard({ p, onAdjust, onEdit, onAlert, onShowHistory }) {
                                 div >
                                 <
                                 strong > { p.name } < /strong> <
-                                div >
-                                Qty: { p.qty }(threshold { p.threshold }) <
-                                /div> <
+                                div > Qty: { p.qty }(threshold { p.threshold }) < /div> <
                                 /div> <
                                 div >
                                 <
                                 button onClick = {
                                     () =>
-                                    mockSendAlert(p).then(() =>
-                                        alert("Mock alert sent for " + p.name)
+                                    hybridAPI.sendAlert(p.product_id).then(() =>
+                                        alert("Alert sent for " + p.name)
                                     )
                                 } >
                                 Send <
@@ -348,20 +312,23 @@ function ProductCard({ p, onAdjust, onEdit, onAlert, onShowHistory }) {
                 const [historyProduct, setHistoryProduct] = useState(null);
                 const [loading, setLoading] = useState(true);
 
-                // Load products from API on mount
+                // Load products from Firestore on mount
                 useEffect(() => {
                     async function loadProducts() {
                         try {
+                            console.log("📡 Loading products from Firestore...");
                             setLoading(true);
-                            localStorage.removeItem(storageKey);
                             const result = await hybridAPI.getAll();
-                            if (result.success && result.data && result.data.length > 0) {
+
+                            if (result.success && result.data && Array.isArray(result.data)) {
+                                console.log(`✅ Loaded ${result.data.length} products from Firestore`);
                                 setData({ products: result.data });
                             } else {
+                                console.log("ℹ️ No products found in Firestore or empty array");
                                 setData({ products: [] });
                             }
                         } catch (err) {
-                            console.error("Error loading products:", err);
+                            console.error("❌ Error loading products:", err);
                             setData({ products: [] });
                         } finally {
                             setLoading(false);
@@ -382,8 +349,10 @@ function ProductCard({ p, onAdjust, onEdit, onAlert, onShowHistory }) {
                         let result;
 
                         if (exists) {
+                            console.log(`📝 Updating product: ${p.product_id}`);
                             result = await hybridAPI.update(p.product_id, p);
                         } else {
+                            console.log(`✨ Creating new product: ${p.name}`);
                             result = await hybridAPI.create({
                                 ...p,
                                 history: [],
@@ -392,6 +361,7 @@ function ProductCard({ p, onAdjust, onEdit, onAlert, onShowHistory }) {
 
                         if (result.success) {
                             const newProduct = result.data || p;
+                            console.log(`✅ Product saved to Firestore:`, newProduct);
                             setData((prev) => {
                                 let products;
                                 if (exists) {
@@ -407,51 +377,60 @@ function ProductCard({ p, onAdjust, onEdit, onAlert, onShowHistory }) {
                             });
                             setEditing(null);
                         } else {
-                            console.error("Failed to upsert product:", result.error);
+                            console.error("❌ Failed to save product:", result.error);
                             alert("Failed to save product: " + (result.error || "Unknown error"));
                         }
                     } catch (err) {
-                        console.error("Error in upsertProduct:", err);
+                        console.error("❌ Error in upsertProduct:", err);
                         alert("Error saving product: " + err.message);
                     }
                 }
 
                 async function adjust(p, delta) {
-                    const result = await hybridAPI.updateQuantity(p.product_id, delta);
-                    if (result.success && result.data) {
-                        const updatedProduct = result.data;
-                        setData((prev) => {
-                            const products = prev.products.map((x) =>
-                                x.product_id === updatedProduct.product_id ? updatedProduct : x
-                            );
+                    try {
+                        console.log(`📊 Updating quantity for ${p.name}: ${delta > 0 ? '+' : ''}${delta}`);
+                        const result = await hybridAPI.updateQuantity(p.product_id, delta);
 
-                            if (
-                                updatedProduct.qty <= updatedProduct.threshold &&
-                                updatedProduct.autoAlert
-                            ) {
-                                hybridAPI.sendAlert(updatedProduct.product_id).then(() => {
-                                    alert("Auto alert sent for " + updatedProduct.name);
-                                });
-                            }
+                        if (result.success && result.data) {
+                            const updatedProduct = result.data;
+                            console.log(`✅ Quantity updated in Firestore:`, updatedProduct);
 
-                            return {...prev, products };
-                        });
-                    } else {
-                        console.error(
-                            "Failed to update quantity:",
-                            result.error || "No data returned"
-                        );
-                        alert(
-                            "Failed to update product: " + (result.error || "No data returned")
-                        );
+                            setData((prev) => {
+                                const products = prev.products.map((x) =>
+                                    x.product_id === updatedProduct.product_id ? updatedProduct : x
+                                );
+
+                                if (
+                                    updatedProduct.qty <= updatedProduct.threshold &&
+                                    updatedProduct.autoAlert
+                                ) {
+                                    hybridAPI.sendAlert(updatedProduct.product_id).then(() => {
+                                        console.log(`📧 Auto-alert sent for ${updatedProduct.name}`);
+                                        alert("Auto alert sent for " + updatedProduct.name);
+                                    });
+                                }
+
+                                return {...prev, products };
+                            });
+                        } else {
+                            console.error("❌ Failed to update quantity:", result.error);
+                            alert("Failed to update product: " + (result.error || "No data returned"));
+                        }
+                    } catch (err) {
+                        console.error("❌ Error in adjust:", err);
+                        alert("Error updating product: " + err.message);
                     }
                 }
 
                 async function manualSendAlert(p) {
                     try {
+                        console.log(`📧 Sending alert for ${p.name}...`);
                         const result = await hybridAPI.sendAlert(p.product_id);
+
                         if (result.success) {
+                            console.log(`✅ Alert sent for ${p.name}`);
                             alert("Alert sent for " + p.name);
+
                             setData((prev) => {
                                 const products = prev.products.map((x) =>
                                     x.product_id === p.product_id ?
@@ -467,20 +446,13 @@ function ProductCard({ p, onAdjust, onEdit, onAlert, onShowHistory }) {
                                 return {...prev, products };
                             });
                         } else {
-                            console.error("Failed to send alert:", result.error);
+                            console.error("❌ Failed to send alert:", result.error);
                             alert("Failed to send alert: " + (result.error || "Unknown error"));
                         }
                     } catch (err) {
-                        console.error("Error in manualSendAlert:", err);
+                        console.error("❌ Error in manualSendAlert:", err);
                         alert("Error sending alert: " + err.message);
                     }
-                }
-
-                function sendAllAlerts() {
-                    const low = data.products.filter((p) => p.qty <= p.threshold);
-                    Promise.all(low.map((p) => mockSendAlert(p))).then(() =>
-                        alert("Mock alerts sent for " + low.length + " items")
-                    );
                 }
 
                 const filtered = data.products.filter(
@@ -491,6 +463,17 @@ function ProductCard({ p, onAdjust, onEdit, onAlert, onShowHistory }) {
                 const visible = filterLow ?
                     filtered.filter((p) => p.qty <= p.threshold) :
                     filtered;
+
+                if (loading) {
+                    return ( <
+                        div style = {
+                            { padding: 16, textAlign: "center" } } >
+                        <
+                        h1 > Inventory Dashboard < /h1> <
+                        p > Loading products from Firestore... < /p> <
+                        /div>
+                    );
+                }
 
                 return ( <
                     div style = {
@@ -553,7 +536,8 @@ function ProductCard({ p, onAdjust, onEdit, onAlert, onShowHistory }) {
                             <
                             AlertsPanel
                         lowItems = { data.products.filter((p) => p.qty <= p.threshold) }
-                        onSendAll = { sendAllAlerts }
+                        onSendAll = {
+                            () => alert("Feature coming soon") }
                         /> <
                         div
                         style = {
@@ -567,17 +551,11 @@ function ProductCard({ p, onAdjust, onEdit, onAlert, onShowHistory }) {
                             <
                             h4 > Quick Actions < /h4> <
                             p style = {
-                                { fontSize: "0.85em" } } >
-                            Manage your inventory efficiently <
-                            /p> <
+                                { fontSize: "0.85em" } } > All changes saved to Firestore < /p> <
                             button
                         onClick = {
-                                () => {
-                                    localStorage.removeItem(storageKey);
-                                    setData({ products: [] });
-                                }
-                            } >
-                            Clear Local Data <
+                                () => window.location.reload() } >
+                            Refresh Data <
                             /button> <
                             /div> <
                             div
