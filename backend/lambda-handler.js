@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Firestore Backend - Inventory Dashboard
  * Firebase Admin SDK for Vercel serverless
  */
@@ -293,8 +293,8 @@ async function sendAlertById(productId) {
 // Main handler
 async function handler(event, context) {
     try {
-        // Extract HTTP method and path
-        const method = event.httpMethod || event.requestContext ? .http ? .method;
+        // Extract HTTP method and path  
+        const method = event.httpMethod || event.requestContext?.http?.method;
         const path = event.path || event.rawPath || "";
 
         console.log("📨 HANDLER CALLED:", { method, path });

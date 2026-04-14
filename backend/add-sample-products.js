@@ -116,3 +116,32 @@ async function addSampleProducts() {
 }
 
 addSampleProducts();
+
+// Test 1: Firebase connection
+fetch("/api/firebase-status")
+  .then((r) => r.json())
+  .then((d) => console.log("Firebase Status:", JSON.stringify(d, null, 2)));
+
+// Test 2: Check what's actually in Firestore
+fetch("/api/products-in-firestore")
+  .then((r) => r.json())
+  .then((d) => console.log("Firestore Products:", JSON.stringify(d, null, 2)));
+
+// Test 3: Try creating a product directly via API
+fetch("/api/products", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    name: "Test Direct",
+    sku: "DIRECT-001",
+    qty: 5,
+    threshold: 2,
+    category: "Test",
+    contact: "test@test.com",
+    autoAlert: false,
+  }),
+}).then((r) =>
+  r
+    .json()
+    .then((d) => console.log("Create Response:", JSON.stringify(d, null, 2))),
+);
